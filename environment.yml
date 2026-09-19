@@ -1,0 +1,34 @@
+name: crypto-pipeline
+
+channels:
+  - conda-forge
+
+dependencies:
+  # Pinned to 3.11: Spark 3.5.x does not support 3.12+, and you will need
+  # this same interpreter for the Structured Streaming job in stage 2.
+  - python=3.11
+
+  # --- Stage 1: producer ---
+  - python-confluent-kafka=2.14.*   # imports as confluent_kafka
+  - websocket-client=1.8.*
+  - python-dotenv=1.0.*
+
+  # --- Dev tooling ---
+  - pytest=8.*
+  - ruff=0.8.*
+  - ipython
+
+  # --- Stage 2+: uncomment as you get there ---
+  # - pyspark=3.5.*
+  # - openjdk=17                    # required by pyspark
+  # - pyarrow=17.*
+  # - pandas=2.2.*
+  # - duckdb=1.1.*
+  # - boto3=1.35.*                  # MinIO / S3 access
+  # - fastavro=1.9.*                # if you go Avro rather than Protobuf
+
+  - pip
+  - pip:
+      # Not packaged on conda-forge, or the conda build lags badly.
+      # - confluent-kafka[avro,schemaregistry]  # only if you need the SR client
+      []
