@@ -1,3 +1,4 @@
+
 services:
   kafka:
     image: apache/kafka:3.9.0
@@ -20,5 +21,30 @@ services:
     volumes:
       - kafka-data:/var/lib/kafka/data
 
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.48
+    container_name: seaweedfs
+    command: server -dir=/data -s3 -s3.config=/etc/seaweedfs/s3.json
+    ports:
+      - "8333:8333"
+    volumes:
+      - seaweed-data:/data
+      - ./config/s3.json:/etc/seaweedfs/s3.json:ro
+
+  create-bucket:
+    image: amazon/aws-cli:latest
+    depends_on:
+      - seaweedfs
+    environment:
+      AWS_ACCESS_KEY_ID: localdev
+      AWS_SECRET_ACCESS_KEY: localdevsecret
+      AWS_DEFAULT_REGION: us-east-1
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until aws --endpoint-url http://seaweedfs:8333 s3 ls > /dev/null 2>&1; do sleep 2; done
+        aws --endpoint-url http://seaweedfs:8333 s3 mb s3://lake || true
+
 volumes:
   kafka-data:
+  seaweed-data:
