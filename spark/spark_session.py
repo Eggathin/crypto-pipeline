@@ -2,6 +2,10 @@ import os
 
 from pyspark.sql import SparkSession
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 SPARK_VERSION = "3.5.3"
 
 PACKAGES = [
@@ -19,8 +23,8 @@ def get_spark(app_name):
         .config("spark.sql.session.timeZone", "UTC")
         .config("spark.sql.shuffle.partitions", "4")
         .config("spark.hadoop.fs.s3a.endpoint", os.environ.get("S3_ENDPOINT", "http://localhost:8333"))
-        .config("spark.hadoop.fs.s3a.access.key", os.environ.get("S3_ACCESS_KEY", "localdev"))
-        .config("spark.hadoop.fs.s3a.secret.key", os.environ.get("S3_SECRET_KEY", "localdevsecret"))
+        .config("spark.hadoop.fs.s3a.access.key", os.environ["S3_ACCESS_KEY"])
+        .config("spark.hadoop.fs.s3a.secret.key", os.environ["S3_SECRET_KEY"])
         .config("spark.hadoop.fs.s3a.path.style.access", "true")
         .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
         .config(

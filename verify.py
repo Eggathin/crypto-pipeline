@@ -1,17 +1,25 @@
+import os
+from urllib.parse import urlparse
+
 import duckdb
+from dotenv import load_dotenv
+
+load_dotenv()
+
+endpoint = urlparse(os.environ["S3_ENDPOINT"])
 
 con = duckdb.connect()
 con.sql("SET TimeZone = 'UTC'")
 con.sql("INSTALL httpfs")
 con.sql("LOAD httpfs")
-con.sql("""
+con.sql(f"""
     CREATE SECRET lake (
         TYPE s3,
-        KEY_ID 'localdev',
-        SECRET 'localdevsecret',
-        ENDPOINT 'localhost:8333',
+        KEY_ID '{os.environ["S3_ACCESS_KEY"]}',
+        SECRET '{os.environ["S3_SECRET_KEY"]}',
+        ENDPOINT '{endpoint.netloc}',
         URL_STYLE 'path',
-        USE_SSL false
+        USE_SSL {str(endpoint.scheme == "https").lower()}
     )
 """)
 

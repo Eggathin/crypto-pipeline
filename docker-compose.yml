@@ -4,7 +4,7 @@ services:
     image: apache/kafka:3.9.0
     container_name: kafka
     ports:
-      - "9094:9094"
+      - "127.0.0.1:9094:9094"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -26,7 +26,7 @@ services:
     container_name: seaweedfs
     command: server -dir=/data -s3 -s3.config=/etc/seaweedfs/s3.json
     ports:
-      - "8333:8333"
+      - "127.0.0.1:8333:8333"
     volumes:
       - seaweed-data:/data
       - ./config/s3.json:/etc/seaweedfs/s3.json:ro
@@ -36,8 +36,8 @@ services:
     depends_on:
       - seaweedfs
     environment:
-      AWS_ACCESS_KEY_ID: localdev
-      AWS_SECRET_ACCESS_KEY: localdevsecret
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY}
       AWS_DEFAULT_REGION: us-east-1
     entrypoint: ["/bin/sh", "-c"]
     command:
